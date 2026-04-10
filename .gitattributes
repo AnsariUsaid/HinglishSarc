@@ -1,0 +1,2 @@
+*.safetensors filter=lfs diff=lfs merge=lfs -text
+mbert_baseline_model/* filter=lfs diff=lfs merge=lfs -text

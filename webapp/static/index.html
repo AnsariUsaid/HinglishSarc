@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarcasm Detection using Emotion-Aware NLP</title>
+    <!-- Use Outfit font for a modern/futuristic look -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-grid"></div>
+
+    <div class="container">
+        <header>
+            <h1>Sarcasm Detection</h1>
+            <h2>using Emotion-Aware NLP</h2>
+        </header>
+
+        <main class="glass-card main-card">
+            <div class="input-section">
+                <textarea id="textInput" placeholder="Enter a sentence to analyze its sarcasm and emotional trajectory..."></textarea>
+                
+                <div class="example-buttons">
+                    <button class="example-btn" onclick="setExample('I just love waiting in traffic for two hours.')">Examples: "I love waiting..."</button>
+                    <button class="example-btn" onclick="setExample('Mujhe laga tha aaj baarish hogi, thank god nahi hui.')">"Mujhe laga tha..."</button>
+                    <button class="example-btn" onclick="setExample('Oh wow, another meeting that could have been an email.')">"Another meeting..."</button>
+                </div>
+
+                <button id="detectBtn" class="neon-btn">Detect Sarcasm</button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSection" class="hidden">
+                <div class="spinner"></div>
+                <p>Analyzing Emotional Trajectory...</p>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultSection" class="hidden">
+                <div class="result-header">
+                    <h3 id="predictionText">Sarcastic</h3>
+                </div>
+                
+                <div class="metrics">
+                    <div class="metric-box">
+                        <span class="label">Confidence Score</span>
+                        <span class="value neon-text" id="confidenceValue">0%</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="label">Overall Emotion</span>
+                        <span class="value" id="emotionValue">Neutral</span>
+                    </div>
+                </div>
+
+                <div class="trajectory-section">
+                    <p class="section-title">Emotion Trajectory</p>
+                    <div class="trajectory-flow" id="trajectoryFlow">
+                        <!-- Arrows and elements will be appended here by JS -->
+                    </div>
+                </div>
+
+                <button class="ghost-btn" id="resetBtn">Analyze Another</button>
+            </div>
+        </main>
+        
+        <div style="text-align: center; margin-top: 1.5rem; color: rgba(255,255,255,0.5); font-size: 0.85rem; letter-spacing: 0.5px;">
+            Note: Demo system combines machine learning with heuristic rules for better interpretability.
+        </div>
+    </div>
+
+    <!-- Model Information Panel -->
+    <div class="model-info-panel glass-card">
+        <h4>Model Specifications</h4>
+        <ul>
+            <li><span>Model:</span> mBERT</li>
+            <li><span>Dataset:</span> Hinglish + Hindi</li>
+            <li><span>F1 Score:</span> ~0.73</li>
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
