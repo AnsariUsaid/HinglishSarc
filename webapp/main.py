@@ -1,7 +1,7 @@
 import os
 import torch
 import math
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -44,7 +44,7 @@ except Exception as e:
     # Fallback to false if model directory isn't setup correctly yet.
     SARCASM_LOADED = False
 
-print("Models Loaded successfully!" if SARCASM_LOADED else "Warning: Sarcasm model failed to load. Will return mock predictions.")
+print("Models Loaded successfully!" if SARCASM_LOADED else "Warning: Sarcasm model failed to load. Predictions unavailable.")
 
 # Pydantic Schemas
 class PredictRequest(BaseModel):
@@ -96,56 +96,28 @@ async def predict_sarcasm(request: PredictRequest):
         overall_emotion = "neutral"
         trajectory = ["neutral", "neutral", "neutral"]
 
-    # 2. Sarcasm detection natively on RAW text directly (No injected emotion)
-    final_text = text
-    
-    # 3. Model Inference
-    if SARCASM_LOADED:
-        with torch.no_grad():
-            inputs = sarcasm_tokenizer(
-                final_text,
-                truncation=True,
-                padding='max_length',
-                max_length=128,
-                return_tensors='pt'
-            )
-            input_ids = inputs['input_ids'].to(DEVICE)
-            attention_mask = inputs['attention_mask'].to(DEVICE)
-            
-            outputs = sarcasm_model(input_ids=input_ids, attention_mask=attention_mask)
-            logits = outputs.logits
-            probs = F.softmax(logits, dim=1)
-            
-            # Assuming label 1 is sarcastic, 0 is not
-            pred_class = torch.argmax(probs, dim=1).item()
-            confidence = probs[0][pred_class].item()
-            
-            is_sarcastic = bool(pred_class == 1)
-    else:
-        # Mock logic if model directory doesn't exist
-        is_sarcastic = len(text) % 2 == 0
-        confidence = 0.95
+    if not SARCASM_LOADED:
+        raise HTTPException(status_code=503, detail="Sarcasm model is not loaded on the backend.")
 
-    # 4. Rule-Based Correction Layer (Heuristics for Demo)
-    text_lower = text.lower()
-    
-    positive_words = ["great", "amazing", "best", "love"]
-    negative_words = ["crashed", "failed", "late", "bad", "worst", "again"]
-    contrast_phrases = ["yeah", "wow", "oh great", "just what i needed"]
-    
-    # Rule A: Contrast expressions immediately boost sarcasm probability
-    for phrase in contrast_phrases:
-        if phrase in text_lower:
-            is_sarcastic = True
-            confidence = max(confidence, 0.88)
-            
-    # Rule B: High positive words juxtaposed with negative event signals sarcasm
-    has_pos = any(w in text_lower for w in positive_words)
-    has_neg = any(w in text_lower for w in negative_words)
-    
-    if has_pos and has_neg:
-        is_sarcastic = True
-        confidence = 0.92  # Force to 0.92 confidence
+    # 2. Sarcasm model inference on raw input text.
+    with torch.no_grad():
+        inputs = sarcasm_tokenizer(
+            text,
+            truncation=True,
+            padding='max_length',
+            max_length=128,
+            return_tensors='pt'
+        )
+        input_ids = inputs['input_ids'].to(DEVICE)
+        attention_mask = inputs['attention_mask'].to(DEVICE)
+        
+        outputs = sarcasm_model(input_ids=input_ids, attention_mask=attention_mask)
+        logits = outputs.logits
+        probs = F.softmax(logits, dim=1)
+        
+        pred_class = torch.argmax(probs, dim=1).item()
+        confidence = probs[0][pred_class].item()
+        is_sarcastic = bool(pred_class == 1)
         
     return PredictResponse(
         sarcastic=is_sarcastic,

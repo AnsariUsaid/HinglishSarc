@@ -1,0 +1,79 @@
+.notch-nav-root {
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.notch-container {
+  position: relative;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-alpha);
+  color: var(--text);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.notch-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin: 0;
+  list-style: none;
+}
+
+.notch-btn {
+  position: relative;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  outline: none;
+  transition: color 0.2s ease;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+}
+
+.notch-btn:hover {
+  color: var(--text);
+}
+
+.notch-btn.active {
+  color: var(--text);
+}
+
+.notch-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--border);
+}
+
+.notch-indicator {
+  pointer-events: none;
+  position: absolute;
+  overflow: hidden;
+  border-radius: 2px;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0;
+  bottom: -4px;
+  height: 10px;
+  will-change: transform, width, opacity;
+  color: var(--text);
+}
+
+.notch-indicator.ready {
+  opacity: 1;
+}
+
+.notch-indicator.reduced-motion {
+  transition-duration: 0ms;
+}
+
+.notch-indicator svg {
+  display: block;
+  color: var(--text);
+}
